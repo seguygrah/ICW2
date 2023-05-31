@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Vue Petshop</title>
+            <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+            
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+        
+        </head>
+        
+        <body>    
+            <div id="app">
+                <header>
+                    <h1 v-text="sitename"></h1>
+
+                </header>
+                
+                <button v-on:click="showCheckout">
+                    {{cartItemCount}}
+                    <span class="fa-solid fa-cart-shopping"></span> Checkout
+                </button>
+                <br>
+             
+  
+                <main>
+                   
+                    <div v-if="showSession">
+                        <div>
+                            <input type="radio" value= "Ascending" id="ascending" v-model="ascendSort"/> 
+                            <Label for="ascending"> Ascending</Label>
+                            <input type="radio" value= "Descending" id="descending" v-model="ascendSort"/>
+                            <label for="descending"> Descending</label>
+                            <br>
+                        </div>
+    
+                        <div>
+                            <input type="text" v-model="searchTaken" placeholder="Search"/>
+                            <br>
+                        </div>
+                        <br>
+                        <div>
+                            <label> Sort by</label>
+                            <select name="sort" v-model="sort">
+                                <option>--Sort By--</option>
+                                <option value="title">Title</option>
+                                <option value="price">Price</option>
+                                <option value="location">Location</option>
+                                <option value="availablespace">Spaces</option>
+                            </select>
+                        </div>
+                        <br>
+                        <div v-for="session in filterSessions()">
+                                <br>
+                            <i :class="session.icon"></i>
+
+                            <h2 v-text="session.title"></h2>
+                            <img v-bind:src="session.image" alt="" width="100%">
+                            <p>Price: {{session.price}}</p>
+                            <p>Location: {{session.location}}</p>
+                            
+                            <p>Space:{{session.availablespace}}</p>
+                            
+                            <button v-on:click='addToCart(session)' v-if="canAddToCart(session)"> 
+                            Add to cart
+                            </button>
+                            <button disabled="disabled" v-else> 
+                                Add to cart
+                            </button>
+                            <br> 
+                        
+                        </div>
+                    </div>
+                    
+                    <div v-else>
+                        <h2>Checkout</h2>
+
+                        <div v-for="lesson in chechOut()">
+
+                            <h2 v-text="lesson.courses.title"></h2>
+
+                            <p>Price: {{lesson.courses.price}}</p>
+
+                            <p>Location: {{lesson.courses.location}}</p>
+                            <button v-on:click='removeCartItem(lesson)'> 
+                                Remove Session
+                                </button>
+    
+
+                        </div>
+                        <p>
+                            <strong>Name:</strong>
+                            <input v-model.trim="name"/>
+                        </p>
+
+                        <P> 
+                            <strong>Phone:</strong>
+                            <input type="number" v-model.number="phone"  />
+                        </P> 
+
+                        <h2>Booking Information</h2>
+                        <p>Name: {{name}}</p>
+                        <p>Phone: {{phone}}</p>
+                        <p>
+                            <button disabled="disabled" v-if="!Correct"> Place Order </button>
+                            <button v-else v-on:click="submitForm" type="submit"> Place Order </button>
+                        </p>                   
+                        
+
+                    </div>
+
+
+                </main>
+
+
+
+            </div>
+    
+            <script>
+            
+                var club = new Vue ({
+
+                    el: '#app',
+                    created:()=>{
+                        fetch(`http://localhost:3000/collection/courses`).then(res => res.json())
+                        .then(res => {
+                            club.sessions = res
+                        })
+                    },
+                    data: 
+                    {
+
+                        sitename: 'AFTER SCHOOL CLUB',
+                        
+                        sessions: [], 
+
+                        showSession: true,
+
+                        cart: [],
+
+                      
+                            name: '',
+                            phone: '',
+                        
+
+                        ascendSort: 'Ascending',
+
+                        searchTaken: '',
+
+                        sort:'--Sort By--'
+
+
+                    },
+                    
+                    methods: 
+                    {
+
+                        addToCart (courses) {
+                            courses.availablespace--
+                            const id = Math.ceil(Math.random()*10000)+`${courses.title}`
+                            this.cart.push({id:id, "courses":courses})
+                        },
+
+                        showCheckout (){
+                        this.showSession= this.showSession ? false : true;
+
+                        },
+
+                        chechOut() {
+                                let show = this.cart
+                                return show
+                        },
+
+                        removeCartItem(cartSession) {
+
+                            for (let i = 0; i < this.sessions.length; i++) {
+                                const lssn = this.sessions[i];
+
+                           if (cartSession.courses.id == lssn.id) {
+                             lssn.availablespace++
+                             break;
+                            }
+                            }
+                            for (let i = 0; i < this.cart.length; i++) {
+                                const item = this.cart[i];
+                            if (cartSession.id == item.id) {
+                                    this.cart.splice (i,1)
+                                    break;
+   
+                                    }
+                             }
+                   },
+                        submitForm(){
+                            alert('Request submitted');
+                            let data = {}
+                            for (let i = 0; i < this.cart.length; i++) {
+                                const item = this.cart[i].courses;
+                                if (!data[`${item["_id"]}`]) {
+                                    data[`${item["_id"]}`] = {
+                                        "availablespace":1,
+                                        "item":item
+                                    }
+                                }else{
+                                    data[`${item["_id"]}`]["availablespace"]++
+                                }
+                            }
+
+                            const keys = Object.keys(data)
+                            const values = Object.values(data)
+                            fetch(`http://localhost:3000/collection/order`,{
+                                method:'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    "name":this.name,
+                                    "phone":this.phone,
+                                })
+                            })
+                            .then(result => result.json())
+                            .then(result =>{
+                                if (result.length == 1) {
+                                    fetch(`http://localhost:3000/collection/order/${result[0]["_id"]}`,{
+                                        method:'PUT',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({"items":values})
+                                    }).then(result => result.json())
+                                    .then(result => {
+                                        for (let i = 0; i < keys.length; i++) {
+                                            const key = keys[i];
+                                            const value = values[i];
+                                            fetch(`http://localhost:3000/collection/courses/${key}`,{
+                                                method:'PUT',
+                                                headers: {
+                                                    'Content-Type': 'application/json'
+                                                },
+                                                body: JSON.stringify({"availablespace":value["item"].availablespace})
+                                            })
+                                        }
+                                        this.cart = []
+                                    })
+                                }
+                            }).catch(err =>{
+                                console.log(err);
+                            });
+                         },
+                         canAddToCart(courses) {
+                        return  courses.availablespace > this.cartCount(courses.id);
+                        },
+                        cartCount(id) {
+                        let count = 0;
+                        for (let i=0; i < this.cart.length; i++){
+                            if (this.cart[i] === id){
+                                count++;
+                            }
+                        }
+                        return count;
+                                     },
+
+
+                
+
+                    sortPrice: function(priceArray){
+                        function compare(a,b) {
+                            if (a.price > b.price)
+                                return 1;
+                            if (a.price < b.price)
+                                return -1;
+                            return 0;
+                        }
+                        return priceArray.sort(compare);
+                    },
+
+                    sortLocation: function(locationArray){
+                        function compare(a,b) {
+                            if (a.location > b.location)
+                                return 1;
+                            if (a.location < b.location)
+                                return -1;
+                            return 0;
+                        }
+                        return locationArray.sort(compare);
+                        
+                    },
+                    sortTitle: function(titleArray){
+                        function compare(a,b) {
+                            if (a.title > b.title)
+                                return 1;
+                            if (a.title < b.title)
+                                return -1;
+                            return 0;
+                        }
+                        return titleArray.sort(compare);
+                        
+                    },
+                    sortSpaces: function(spacesArray){
+                        function compare(a,b) {
+                            if (a.availablespace > b.availablespace)
+                                return 1;
+                            if (a.availablespace < b.availablespace)
+                                return -1;
+                            return 0;
+                        }
+                        return spacesArray.sort(compare);                
+                    },
+
+                    filterSessions: function() {
+                        let lessonses = this.sessions
+                 
+                        lessonses = lessonses.filter((courses) => {
+                          
+                            return courses.title.toLowerCase().match(this.searchTaken.toLowerCase()) || courses.location.toLowerCase().match(this.searchTaken.toLowerCase())
+                            
+                        }) 
+
+                        if (this.sort == 'price') {
+                            lessonses = this.sortPrice(lessonses)
+                        }
+                        else if (this.sort =='title') {
+                            lessonses = this.sortTitle(lessonses)
+                        }
+                        else if (this.sort =='location') {
+                            lessonses = this.sortLocation(lessonses)
+                        }
+                        else if (this.sort =='availablespace') {
+                            lessonses = this.sortSpaces(lessonses)
+                        }
+
+                        if (this.ascendSort == 'Ascending'){
+                            return lessonses
+                        }
+                        else if (this.ascendSort =='Descending'){
+                            return lessonses.reverse()
+                        }
+                        return lessonses
+                        
+                    }
+                },
+                    
+
+                    computed:  
+                {
+                    cartItemCount: function() {
+                        return this.cart.length || '';
+                    },
+                    Correct: function(){
+                        return this.name.trim () !=='' && this.phone !==''
+                    }
+
+
+
+
+
+
+                }
+
+                    
+
+               });
+              
+            </script>
+        </body>
+    </html>
