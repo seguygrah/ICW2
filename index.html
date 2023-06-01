@@ -46,7 +46,7 @@
                     <div id="filters" style="display:inline-flex; align-self: flex-start; width: 30%;">
                         <div>
                             <input type="radio" value= "Ascending" id="ascending" v-model="ascendSort"/> 
-                            <Label for="ascending"> Ascending</Label>
+                            <Label for="ascending"> Ascending</Label> <br>
                             <input type="radio" value= "Descending" id="descending" v-model="ascendSort"/>
                             <label for="descending"> Descending</label>
                             <br>
@@ -83,20 +83,20 @@
                     </div>  
                         <section style="width: 100%;">
                             <div id="search">
-                                <input type="text" placeholder="search" v-if="search" v-model="searchTaken">
-                                <button v-on:click="search"><i class='bx bx-search'></i></button>
+                                <input type="text" placeholder="search" v-model="searchTaken">
+                                <!-- <button ><i class='bx bx-search'></i></button> -->
                             </div>
             
                             <div id="classlists">
                                 <div class="classlist" v-for="session in filterSessions()">
-                                    <img v-bind:src="session.icon" alt="" width="100%">
+                                    <img v-bind:src="session.image" alt="" width="100%">
                                     <p>Title: {{session.title}}</p>
                                     <p>Description: {{session.description}}</p>
                                     <p>Location: {{session.location}}</p>
                                     <p>Price: {{session.price}}</p>
                                     <p>AvailableSpace: {{session.availablespace}}</p>
                                     <button v-on:click='addToCart(session)' v-if="canAddToCart(session)"> 
-                                        Add to cart>Add To Cart</button>
+                                        Add To Cart</button>
                                     <button v-else disabled>Add To Cart</button>
                                 </div>
                             </div>
@@ -140,9 +140,9 @@
                             </div>
                         <div>
                             <h2>User Lesson Selection</h2>
-                            <p> Surname: {{surname}} </p>
-                            <p> Name: {{Name}}</p>
-                            <p> Phone Number: {{tel}}</p>
+                            <!-- <p> Surname: {{surname}} </p> -->
+                            <p> Name: {{name}}</p>
+                            <p> Phone Number: {{number}}</p>
                         </div> 
                         
                         <div>
@@ -157,7 +157,7 @@
                   </main>
                
                
-                  <main>
+                  <!-- <main>
                    
                     <div v-if="showSession">
                        
@@ -231,7 +231,7 @@
                         
 
                     </div>
-                </main>
+                </main> -->
             </div>
 
             <script>
