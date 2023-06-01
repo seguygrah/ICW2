@@ -120,7 +120,7 @@
                         <!--user details: name, surname and phone number-->
                         <div id="Info">
                             <h2>Checkout</h2>
-                            <button v-on:click="displayCheckout">
+                            <button v-on:click="showCheckout">
                                 <i class='bx bx-left-arrow-alt'></i>  
                                 Back 
                             </button>
@@ -141,10 +141,11 @@
                             </p>
                             </div>
                         <div>
+                            <br>
                             <h2>User Lesson Selection</h2>
                             <!-- <p> Surname: {{surname}} </p> -->
-                            <p> Name: {{name}}</p>
-                            <p> Phone Number: {{number}}</p>
+                            <p>Name: {{name}}</p>
+                            <p>Phone: {{phone}}</p>
                         </div> 
                         
                         <div>
@@ -251,22 +252,13 @@
                     {
 
                         sitename: 'AFTER SCHOOL CLUB',
-                        
                         sessions: [], 
-
                         showSession: true,
-
-                        cart: [],
-
-                      
-                            name: '',
-                            phone: '',
-                        
-
+                        cart: [],                      
+                        name: '',
+                        phone: '',
                         ascendSort: 'Ascending',
-
                         searchTaken: '',
-
                         sort:'--Sort By--'
 
 
@@ -379,9 +371,6 @@
                         return count;
                                      },
 
-
-                
-
                     sortPrice: function(priceArray){
                         function compare(a,b) {
                             if (a.price > b.price)
@@ -459,7 +448,6 @@
                     }
                 },
                     
-
                     computed:  
                 {
                     cartItemCount: function() {
@@ -469,15 +457,7 @@
                         return this.name.trim () !=='' && this.phone !==''
                     }
 
-
-
-
-
-
                 }
-
-                    
-
                });
               
             </script>
