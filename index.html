@@ -6,15 +6,23 @@
             <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
             
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
-        
+            <meta charsert="UTF-8"></meta>
+            <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>After School Classes</title>
+            <script src= "https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+            <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+            <link rel="stylesheet" href="style.css">
         </head>
         
         <body>    
             <div id="app">
                 <header>
-                    <h1 v-text="sitename"></h1>
-
-                </header>
+                    <h1> {{sitename}} </h1>
+                  </header>
                 
                 <button v-on:click="showCheckout">
                     {{cartItemCount}}
@@ -22,10 +30,20 @@
                 </button>
                 <br>
              
-  
                 <main>
-                   
-                    <div v-if="showSession">
+                    <section id="home" v-if="showSession">
+                       
+                      <!-- <button v-if = "removeFromCart" id=button v-on:click= "displayCheckout" > 
+                        {{cartItemCount}} 
+                        <i class="bx bx-cart"></i>
+                        Checkout
+                      </button>
+                      <button  disabled="disabled" v-else> {{cartItemCount}} Items
+                    </button> -->
+                       
+                    <section style="display: flex; flex-direction: row; width: 100%;">
+            
+                    <div id="filters" style="display:inline-flex; align-self: flex-start; width: 30%;">
                         <div>
                             <input type="radio" value= "Ascending" id="ascending" v-model="ascendSort"/> 
                             <Label for="ascending"> Ascending</Label>
@@ -33,11 +51,116 @@
                             <label for="descending"> Descending</label>
                             <br>
                         </div>
-    
                         <div>
+                            <label> Sort by</label>
+                            <select name="sort" v-model="sort">
+                                <option>--Sort By--</option>
+                                <option value="title">Title</option>
+                                <option value="price">Price</option>
+                                <option value="location">Location</option>
+                                <option value="availablespace">Spaces</option>
+                            </select>
+                        </div>
+                        <!-- <div>
                             <input type="text" v-model="searchTaken" placeholder="Search"/>
                             <br>
+                        </div> -->
+                        <!-- <div id="sort">
+                            <div v-for="(value, key) in sort_dict">
+                                
+                                <input type="radio" name="sort" value="key" v-if="value.checked" checked v-on:click="sort(key)">
+                                <input type="radio" name="sort" value="key" v-else v-on:click="sort(key)">
+                                <label for="sort">{{key}}</label>
+                            </div>
                         </div>
+                        <div id="order">
+                            <div v-for="(value, key) in order_dict">
+                                <input type="radio" name="order" value="key" v-if="value.checked" checked v-on:click="order(key)">
+                                <input type="radio" name="order" value="key" v-else v-on:click="order(key)">
+                                <label for="order">{{key}}</label>
+                            </div> 
+                        </div> -->
+                    </div>  
+                        <section style="width: 100%;">
+                            <div id="search">
+                                <input type="text" placeholder="search" v-if="search" v-model="searchTaken">
+                                <button v-on:click="search"><i class='bx bx-search'></i></button>
+                            </div>
+            
+                            <div id="classlists">
+                                <div class="classlist" v-for="session in filterSessions()">
+                                    <img v-bind:src="session.icon" alt="" width="100%">
+                                    <p>Title: {{session.title}}</p>
+                                    <p>Description: {{session.description}}</p>
+                                    <p>Location: {{session.location}}</p>
+                                    <p>Price: {{session.price}}</p>
+                                    <p>AvailableSpace: {{session.availablespace}}</p>
+                                    <button v-on:click='addToCart(session)' v-if="canAddToCart(session)"> 
+                                        Add to cart>Add To Cart</button>
+                                    <button v-else disabled>Add To Cart</button>
+                                </div>
+                            </div>
+                        </section> 
+                    </section>
+                </section>
+                    <section id="cart_page" v-else>
+                        <!--cart details after order-->
+                        <div>
+                            <h2>cart</h2>
+                            <div id="classlists">
+                                <div class="classlist"v-for="lesson in chechOut()">
+                                    <p>Title: {{lesson.courses.title}} </p>
+                                    <p>Location: {{lesson.courses.location}}</p>
+                                    <p>Price: {{lesson.courses.price}}</p>
+                                    <button v-on:click='removeCartItem(lesson)'> Remove from cart</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!--user details: name, surname and phone number-->
+                        <div id="Info">
+                            <h2>Checkout</h2>
+                            <button v-on:click="displayCheckout">
+                                <i class='bx bx-left-arrow-alt'></i>  
+                                Back 
+                            </button>
+                            
+                            <!-- <p>
+                                <strong>Surname:</strong>
+                                <input v-model.trim="surname" type="text">
+                            </p> -->
+                            <p>
+                                <strong>Name:</strong>
+                                <input v-model.trim="name" type="text">
+                            </p>
+                            <div>
+                            <p>
+                                <strong>Phone Number:</strong>
+                                <input v-model.number="phone" type="number">
+                            </p>
+                            </div>
+                        <div>
+                            <h2>User Lesson Selection</h2>
+                            <p> Surname: {{surname}} </p>
+                            <p> Name: {{Name}}</p>
+                            <p> Phone Number: {{tel}}</p>
+                        </div> 
+                        
+                        <div>
+                            <h3>Complete</h3>
+                            <!-- <button disabled="disabled" v-if="!isValid">Submit</button>
+                            <button v-else v-on:click="submitForm">End</button> -->
+                            <button disabled="disabled" v-if="!Correct"> Place Order </button>
+                            <button v-else v-on:click="submitForm" type="submit"> Place Order </button>
+                        </div>
+                        </div>
+                    </section>
+                  </main>
+               
+               
+                  <main>
+                   
+                    <div v-if="showSession">
+                       
                         <br>
                         <div>
                             <label> Sort by</label>
@@ -108,14 +231,9 @@
                         
 
                     </div>
-
-
                 </main>
-
-
-
             </div>
-    
+
             <script>
             
                 var club = new Vue ({
